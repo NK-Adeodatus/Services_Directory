@@ -10,12 +10,18 @@ class ListingsRepositoryImpl implements ListingsRepository {
   ListingsRepositoryImpl({required this.remoteDataSource});
 
   @override
-  Stream<Either<Exception, List<Listing>>> watchAllListings() {
-    return remoteDataSource.watchAllListings().map((models) {
-      return Right<Exception, List<Listing>>(models);
-    }).handleError(
-      (e) => Left<Exception, List<Listing>>(e is Exception ? e : Exception(e.toString())),
-    );
+  Stream<Either<Exception, List<Listing>>> watchAllListings() async* {
+    try {
+      await for (final models in remoteDataSource.watchAllListings()) {
+        yield Right<Exception, List<Listing>>(models);
+      }
+    } catch (e) {
+      if (e is Exception) {
+        yield Left<Exception, List<Listing>>(e);
+      } else {
+        yield Left<Exception, List<Listing>>(Exception(e.toString()));
+      }
+    }
   }
 
   @override

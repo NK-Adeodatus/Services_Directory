@@ -19,16 +19,23 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final pages = [
+    final pages = <Widget>[
       const DirectoryPage(),
       const MyListingsPage(),
       const MapViewPage(),
       const SettingsPage(),
     ];
 
+    const titles = <String>[
+      'Directory',
+      'My Listings',
+      'Map View',
+      'Settings',
+    ];
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Kigali City Services'),
+        title: Text(titles[_currentIndex]),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -40,6 +47,10 @@ class _HomePageState extends State<HomePage> {
       ),
       body: pages[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: const Color(0xFF001F3F),
+        selectedItemColor: const Color(0xFFFFC857),
+        unselectedItemColor: Colors.white70,
+        type: BottomNavigationBarType.fixed,
         currentIndex: _currentIndex,
         onTap: (index) {
           setState(() {

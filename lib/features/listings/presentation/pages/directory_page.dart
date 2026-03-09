@@ -25,9 +25,21 @@ class DirectoryPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ListingsBloc, ListingsState>(
-      builder: (context, state) {
-        return Column(
+    return BlocListener<ListingsBloc, ListingsState>(
+      listenWhen: (previous, current) =>
+          previous.errorMessage != current.errorMessage &&
+          current.errorMessage != null,
+      listener: (context, state) {
+        final message = state.errorMessage;
+        if (message != null && message.isNotEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(message)),
+          );
+        }
+      },
+      child: BlocBuilder<ListingsBloc, ListingsState>(
+        builder: (context, state) {
+          return Column(
           children: [
             Padding(
               padding: const EdgeInsets.all(16),
@@ -96,7 +108,8 @@ class DirectoryPage extends StatelessWidget {
             ),
           ],
         );
-      },
+        },
+      ),
     );
   }
 }

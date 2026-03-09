@@ -85,17 +85,35 @@ class ListingsBloc extends Bloc<ListingsEvent, ListingsState> {
 
   Future<void> _onListingCreated(
       ListingCreated event, Emitter<ListingsState> emit) async {
-    await createListing(event.listing);
+    final result = await createListing(event.listing);
+    result.fold(
+      (failure) => emit(
+        state.copyWith(errorMessage: failure.toString()),
+      ),
+      (_) {},
+    );
   }
 
   Future<void> _onListingUpdated(
       ListingUpdated event, Emitter<ListingsState> emit) async {
-    await updateListing(event.listing);
+    final result = await updateListing(event.listing);
+    result.fold(
+      (failure) => emit(
+        state.copyWith(errorMessage: failure.toString()),
+      ),
+      (_) {},
+    );
   }
 
   Future<void> _onListingDeleted(
       ListingDeleted event, Emitter<ListingsState> emit) async {
-    await deleteListing(event.id);
+    final result = await deleteListing(event.id);
+    result.fold(
+      (failure) => emit(
+        state.copyWith(errorMessage: failure.toString()),
+      ),
+      (_) {},
+    );
   }
 
   List<Listing> _applyFilters({
