@@ -19,22 +19,30 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFF001B33),
       appBar: AppBar(
         title: Text(_isLogin ? 'Login' : 'Sign Up'),
       ),
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthAuthenticated) {
-            // Navigate to home page
+            // Authenticated users are handled by WidgetTree; no explicit navigation needed.
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Logged in successfully'),
+              ),
+            );
           } else if (state is AuthError) {
             ScaffoldMessenger.of(context)
                 .showSnackBar(SnackBar(content: Text(state.message)));
           } else if (state is AuthUnauthenticated && !_isLogin) {
+            // Just finished signup successfully; switch back to login mode.
+            setState(() {
+              _isLogin = true;
+            });
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text(
-                  'Account created. Please check your email to verify, then log in.',
-                ),
+                content: Text('Account created. Please log in.'),
               ),
             );
           }
@@ -47,14 +55,46 @@ class _LoginPageState extends State<LoginPage> {
           return Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 TextField(
                   controller: _emailController,
-                  decoration: const InputDecoration(labelText: 'Email'),
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    labelText: 'Email',
+                    labelStyle: const TextStyle(color: Colors.white70),
+                    filled: true,
+                    fillColor: const Color(0xFF013A63),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide:
+                          const BorderSide(color: Color(0xFFFFC857), width: 2),
+                    ),
+                  ),
                 ),
+                const SizedBox(height: 12),
                 TextField(
                   controller: _passwordController,
-                  decoration: const InputDecoration(labelText: 'Password'),
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    labelText: 'Password',
+                    labelStyle: const TextStyle(color: Colors.white70),
+                    filled: true,
+                    fillColor: const Color(0xFF013A63),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide:
+                          const BorderSide(color: Color(0xFFFFC857), width: 2),
+                    ),
+                  ),
                   obscureText: true,
                 ),
                 const SizedBox(height: 16),
@@ -76,9 +116,12 @@ class _LoginPageState extends State<LoginPage> {
                       _isLogin = !_isLogin;
                     });
                   },
-                  child: Text(_isLogin
-                      ? 'Don\'t have an account? Sign Up'
-                      : 'Have an account? Login'),
+                  child: Text(
+                    _isLogin
+                        ? 'Don\'t have an account? Sign Up'
+                        : 'Have an account? Login',
+                    style: const TextStyle(color: Color(0xFFFFC857)),
+                  ),
                 ),
               ],
             ),

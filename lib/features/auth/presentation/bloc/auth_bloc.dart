@@ -32,7 +32,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final result = await signup(event.email, event.password);
       result.fold(
         (failure) => emit(AuthError(failure.toString())),
-        (_) => emit(AuthUnauthenticated()),// After signup, user is not logged in
+        (_) => emit(AuthUnauthenticated()),
       );
     });
 

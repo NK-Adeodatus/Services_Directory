@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:myapp/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:myapp/features/auth/data/models/user_model.dart';
 import 'package:myapp/features/auth/domain/entities/user.dart';
@@ -13,12 +14,9 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Exception, User>> login(String email, String password) async {
     try {
       final firebaseUser = await remoteDataSource.login(email, password);
-      if (!firebaseUser.emailVerified) {
-        return Left(Exception('Please verify your email before logging in.'));
-      }
       return Right(UserModel.fromFirebaseUser(firebaseUser));
     } on Exception catch (e) {
-      return Left(e);
+      return Left(_mapException(e));
     }
   }
 
@@ -28,7 +26,7 @@ class AuthRepositoryImpl implements AuthRepository {
       await remoteDataSource.signup(email, password);
       return const Right(null);
     } on Exception catch (e) {
-      return Left(e);
+      return Left(_mapException(e));
     }
   }
 
@@ -38,7 +36,7 @@ class AuthRepositoryImpl implements AuthRepository {
       await remoteDataSource.logout();
       return const Right(null);
     } on Exception catch (e) {
-      return Left(e);
+      return Left(_mapException(e));
     }
   }
 
@@ -46,12 +44,20 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Exception, User>> getCurrentUser() async {
     try {
       final user = await remoteDataSource.getCurrentUser();
-      if (user != null && user.emailVerified) {
+      if (user != null) {
         return Right(UserModel.fromFirebaseUser(user));
       }
-      return Left(Exception('User not found or email not verified'));
+      return Left(Exception('User not found'));
     } on Exception catch (e) {
-      return Left(e);
+      return Left(_mapException(e));
     }
+  }
+
+  Exception _mapException(Exception e) {
+    if (e is firebase_auth.FirebaseAuthException) {
+      final message = e.message ?? e.code;
+      return Exception(message);
+    }
+    return e;
   }
 }
